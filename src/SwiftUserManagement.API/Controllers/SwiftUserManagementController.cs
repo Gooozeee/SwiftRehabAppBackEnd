@@ -23,7 +23,6 @@ namespace SwiftUserManagement.API.Controllers
         }
 
         // Creating a user in the database
-        [Authorize]
         [HttpPost(Name = "CreateUser")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -44,6 +43,19 @@ namespace SwiftUserManagement.API.Controllers
                 return BadRequest(new { Message = "User already exists" });
             }
             return CreatedAtRoute("CreateUser", new { userName = user.Password }, user);
+        }
+
+        // Retreiving a user from the database
+        [HttpGet("{userName}", Name = "GetUser")]
+        [ProducesResponseType(typeof(User), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<User>> getUser(string userName)
+        {
+            var user = await _userRepository.GetUser(userName);
+
+            if (user == null) return BadRequest(new { Message = "User not found" });
+
+            return Ok(user);
         }
 
         // Authenticating a user and returning a JWT token
