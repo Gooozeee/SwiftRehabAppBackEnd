@@ -33,9 +33,17 @@ namespace SwiftUserManagement.API.Extensions
                         Connection = connection
                     };
 
+                    // Dropping tables to ensure a clean slate
+                    command.CommandText = "DROP TABLE IF EXISTS Videos";
+                    command.ExecuteNonQuery();
+
+                    command.CommandText = "DROP TABLE IF EXISTS GameScores";
+                    command.ExecuteNonQuery();
+                    
                     command.CommandText = "DROP TABLE IF EXISTS Users";
                     command.ExecuteNonQuery();
 
+                    // Creating and populating the users table
                     command.CommandText = @"CREATE TABLE Users(Id SERIAL PRIMARY KEY,
                                                                 Email VARCHAR(24) NOT NULL,
                                                                 UserName VARCHAR(24) NOT NULL,
@@ -48,6 +56,33 @@ namespace SwiftUserManagement.API.Extensions
                     command.ExecuteNonQuery();
 
                     command.CommandText = "INSERT INTO Users(Email, UserName, Password, Role) VALUES('sophie@gmail.com', 'Sophie Young', 'password', 'User');";
+                    command.ExecuteNonQuery();
+
+                    // Creating and populating the videos table
+                    command.CommandText = @"CREATE TABLE Videos(Id SERIAL PRIMARY KEY,
+                                                                User_Id INT NOT NULL,
+                                                                FilePath VARCHAR(255) NOT NULL,
+                                                                Prediction VARCHAR(255) NOT NULL,
+                                                                CONSTRAINT fk_user
+                                                                    FOREIGN KEY(User_Id)
+                                                                        REFERENCES Users(Id))";
+                    command.ExecuteNonQuery();
+
+                    command.CommandText = "INSERT INTO Videos(User_Id, FilePath, Prediction) VALUES(1, 'filepath', 'prediction');";
+                    command.ExecuteNonQuery();
+
+                    // Creating and populating the game scores table
+                    command.CommandText = @"CREATE TABLE GameScores(Id SERIAL PRIMARY KEY,
+                                                                    User_Id INT NOT NULL,
+                                                                    Level INT NOT NULL,
+                                                                    Score INT NOT NULL,
+                                                                    Explanation VARCHAR(255) NOT NULL,
+                                                                    CONSTRAINT fk_user
+                                                                        FOREIGN KEY(User_Id)
+                                                                            REFERENCES Users(Id))";
+                    command.ExecuteNonQuery();
+
+                    command.CommandText = "INSERT INTO GameScores(User_Id, Level, Score, Explanation) VALUES(1, 1, 45, 'Explanation')";
                     command.ExecuteNonQuery();
 
                     logger.LogInformation("Migrated postgresql database.");
