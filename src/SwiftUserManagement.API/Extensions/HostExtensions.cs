@@ -40,7 +40,7 @@ namespace SwiftUserManagement.API.Extensions
                                                                 Email VARCHAR(24) NOT NULL,
                                                                 UserName VARCHAR(24) NOT NULL,
                                                                 Password VARCHAR(24) NOT NULL,
-                                                                Role VARCHAR(24) NOT NULL,
+                                                                Role VARCHAR(24) NOT NULL
                                                                 )";
                     command.ExecuteNonQuery();
 
