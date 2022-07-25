@@ -10,6 +10,9 @@ services:
   portainer:
     image: portainer/portainer-ce
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+
   swiftusermanagement.api:
     image: ${DOCKER_REGISTRY-}swiftusermanagementapi
     build:
