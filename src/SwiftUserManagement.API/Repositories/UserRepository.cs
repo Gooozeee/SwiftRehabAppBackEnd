@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Npgsql;
-using SwiftUserManagement.Entities;
+using SwiftUserManagement.API.Entities;
 
-namespace SwiftUserManagement.Repositories
+namespace SwiftUserManagement.API.Repositories
 {
     public class UserRepository : IUserRepository
     {
@@ -20,8 +20,6 @@ namespace SwiftUserManagement.Repositories
             using var connection = new NpgsqlConnection
                 (_configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
 
-            //connection.Open();
-
             var affected = await connection.ExecuteAsync
                 ("INSERT INTO Users(Email, UserName, Password, Role) VALUES(@Email, @Username, @Password, @Role);",
                 new { Email = user.Email, Username = user.UserName, Password = user.Password, Role = user.Role});
@@ -34,14 +32,39 @@ namespace SwiftUserManagement.Repositories
             return true;
         }
 
-        public Task<User> GetUser(string userName)
+        // Retreiving a user from the database
+        public async Task<User> GetUser(string userName)
         {
-            throw new NotImplementedException();
+            using var connection = new NpgsqlConnection
+                (_configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
+
+            var user = await connection.QueryFirstOrDefaultAsync<User>
+                ("SELECT * FROM Users WHERE UserName = @UserName", new { UserName = userName });
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return user;
         }
 
-        public Task<User> UpdateUser(string userName)
+        // Updating user details
+        public async Task<bool> UpdateUser(User user)
         {
-            throw new NotImplementedException();
+            using var connection = new NpgsqlConnection
+                (_configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
+
+            var affected = await connection.ExecuteAsync
+                ("UPDATE Users SET Email=@Email, UserName=@UserName, Password=@Password, Role=@Role WHERE Id = @Id",
+                 new { Email = user.Email, UserName = user.UserName, Password = user.Password, Role = user.Role, Id = user.Id });
+
+            if (affected == 0)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SwiftUserManagement.Entities;
-using SwiftUserManagement.Repositories;
+using SwiftUserManagement.API.Entities;
+using SwiftUserManagement.API.Repositories;
 using System.Net;
 
-namespace SwiftUserManagement.Controllers
+namespace SwiftUserManagement.API.Controllers
 {
     // User management controller
     [Route("api/[controller]")]
@@ -13,17 +14,20 @@ namespace SwiftUserManagement.Controllers
     {
         // Dependency injection for the user repository to bring in business logic
         private readonly IUserRepository _userRepository;
+        private readonly IJWTManagementRepository _jwtMangementRepository;
 
-        public SwiftUserManagementController(IUserRepository userRepository)
+        public SwiftUserManagementController(IUserRepository userRepository, IJWTManagementRepository jwtMangementRepository)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _jwtMangementRepository = jwtMangementRepository ?? throw new ArgumentNullException(nameof(jwtMangementRepository));
         }
 
         // Creating a user in the database
-        [HttpPost]
-        [ProducesResponseType(typeof(User), (int)HttpStatusCode.OK)]
+        [Authorize]
+        [HttpPost(Name = "CreateUser")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<User>> createUser([FromBody] User user)
+        [ProducesResponseType((int)HttpStatusCode.Created)]
+        public async Task<ActionResult> createUser([FromBody] User user)
         {
             // Validating the user
             if (string.IsNullOrEmpty(user.UserName) ^ string.IsNullOrEmpty(user.Password))
@@ -39,7 +43,23 @@ namespace SwiftUserManagement.Controllers
             {
                 return BadRequest(new { Message = "User already exists" });
             }
-            return Ok(result);
+            return CreatedAtRoute("CreateUser", new { userName = user.Password }, user);
+        }
+
+        // Authenticating a user and returning a JWT token
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("authenticate")]
+        public IActionResult Authenticate(User user)
+        {
+            var token = _jwtMangementRepository.Authenticate(user);
+
+            if (token == null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(token);
         }
     }
 }

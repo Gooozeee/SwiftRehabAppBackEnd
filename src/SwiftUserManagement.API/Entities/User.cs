@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SwiftUserManagement.Entities
+namespace SwiftUserManagement.API.Entities
 {
 
     public class User
