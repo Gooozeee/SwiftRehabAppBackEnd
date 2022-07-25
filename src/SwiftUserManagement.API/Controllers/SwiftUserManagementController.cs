@@ -11,7 +11,8 @@ namespace SwiftUserManagement.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class SwiftUserManagementController : ControllerBase
-    {
+    { 
+
         // Dependency injection for the user repository to bring in business logic
         private readonly IUserRepository _userRepository;
         private readonly IJWTManagementRepository _jwtMangementRepository;
@@ -56,6 +57,13 @@ namespace SwiftUserManagement.API.Controllers
             if (user == null) return BadRequest(new { Message = "User not found" });
 
             return Ok(user);
+        }
+
+        // Letting the client know it is connected to the server
+        [HttpGet("pingServer", Name = "Ping")]
+        public string pingServer()
+        {
+            return "You are connected to the server";
         }
 
         // Authenticating a user and returning a JWT token
