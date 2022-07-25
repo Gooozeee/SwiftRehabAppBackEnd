@@ -3,12 +3,12 @@
   <PropertyGroup Label="Globals">
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
-    <ProjectGuid>d73a381d-105b-4e6d-b512-deecce84c619</ProjectGuid>
+    <ProjectGuid>9574ded3-452d-41c4-b6bd-7357e12d6b53</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
     <DockerServiceName>swiftusermanagement.api</DockerServiceName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='docker-compose|AnyCPU'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='docker|AnyCPU'" />
   <ItemGroup>
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>

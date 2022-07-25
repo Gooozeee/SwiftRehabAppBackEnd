@@ -8,7 +8,7 @@ namespace SwiftUserManagement.Repositories
     public interface IUserRepository 
     {
         Task<User> GetUser(string userName);
-        Task<User> CreateUser(User user);
-        Task<User> UpdateUser(User user);
+        Task<bool> CreateUser(User user);
+        Task<User> UpdateUser(string userName);
     }
 }

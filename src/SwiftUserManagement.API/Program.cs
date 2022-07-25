@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using SwiftUserManagement.API.Extensions;
+using SwiftUserManagement.Repositories;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +38,8 @@ builder.Services.AddAuthentication(x =>
 });
 
 var app = builder.Build();
+
+app.MigrateDatabase<Program>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
