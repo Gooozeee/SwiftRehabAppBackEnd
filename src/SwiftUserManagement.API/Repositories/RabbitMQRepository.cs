@@ -16,8 +16,13 @@ namespace SwiftUserManagement.API.Repositories
         }
 
         // Sending out the game score analysis task to the queue
-        public void EmitGameAnalysis(GameResults gameResults)
+        public bool EmitGameAnalysis(GameResults gameResults)
         {
+            if (gameResults.result1 == null)
+            {
+                return false;
+            }
+
             // Connecting to the RabbitMQ queue
             var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
@@ -36,6 +41,8 @@ namespace SwiftUserManagement.API.Repositories
                                      basicProperties: null,
                                      body: body);
                 _Logger.LogInformation("Sent game results for analysis");
+
+                return true;
             }
         }
     }

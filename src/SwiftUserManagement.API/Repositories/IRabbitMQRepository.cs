@@ -5,6 +5,6 @@ namespace SwiftUserManagement.API.Repositories
     public interface IRabbitMQRepository
     {
 
-        void EmitGameAnalysis(GameResults gameResults);
+        bool EmitGameAnalysis(GameResults gameResults);
     }
 }

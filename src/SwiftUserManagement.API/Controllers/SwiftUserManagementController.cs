@@ -11,17 +11,21 @@ namespace SwiftUserManagement.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class SwiftUserManagementController : ControllerBase
-    { 
+    {
 
         // Dependency injection for the user repository to bring in business logic
         private readonly IUserRepository _userRepository;
         private readonly IJWTManagementRepository _jwtMangementRepository;
+        private readonly IRabbitMQRepository _rabbitMQRepository;
 
-        public SwiftUserManagementController(IUserRepository userRepository, IJWTManagementRepository jwtMangementRepository)
+        public SwiftUserManagementController(IUserRepository userRepository, IJWTManagementRepository jwtMangementRepository, IRabbitMQRepository rabbitMQRepository)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _jwtMangementRepository = jwtMangementRepository ?? throw new ArgumentNullException(nameof(jwtMangementRepository));
+            _rabbitMQRepository = rabbitMQRepository ?? throw new ArgumentNullException(nameof(rabbitMQRepository));
         }
+
+
 
         // Creating a user in the database
         [HttpPost(Name = "CreateUser")]
@@ -34,7 +38,7 @@ namespace SwiftUserManagement.API.Controllers
             {
                 return BadRequest(new { Message = "User is invalid" });
             }
-            
+
             // Creating the user
             var result = await _userRepository.CreateUser(user);
 
@@ -48,6 +52,7 @@ namespace SwiftUserManagement.API.Controllers
 
         // Retreiving a user from the database
         [HttpGet("{userName}", Name = "GetUser")]
+        [Authorize]
         [ProducesResponseType(typeof(User), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult<User>> getUser(string userName)
@@ -68,9 +73,10 @@ namespace SwiftUserManagement.API.Controllers
 
         // Authenticating a user and returning a JWT token
         [AllowAnonymous]
-        [HttpPost]
-        [Route("authenticate")]
-        public IActionResult Authenticate(User user)
+        [HttpPost("authenticate", Name = "Authenticate")]
+        [ProducesResponseType(typeof(Tokens), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        public ActionResult<Tokens> Authenticate(User user)
         {
             var token = _jwtMangementRepository.Authenticate(user);
 
@@ -80,6 +86,15 @@ namespace SwiftUserManagement.API.Controllers
             }
 
             return Ok(token);
+        }
+
+        // Emitting the game results for analysis by the python file
+        [HttpPost(Name = "AnalyseGameScore")]
+        public ActionResult<bool> AnalyseGameResults([FromBody] GameResults gameResults)
+        {
+            var result = _rabbitMQRepository.EmitGameAnalysis(gameResults);
+            if (!result) return BadRequest(new { Message = "User not found" });
+            return Ok(result);
         }
     }
 }
