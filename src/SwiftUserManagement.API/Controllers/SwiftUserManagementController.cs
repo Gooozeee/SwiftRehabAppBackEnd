@@ -73,7 +73,7 @@ namespace SwiftUserManagement.API.Controllers
 
         // Authenticating a user and returning a JWT token
         [AllowAnonymous]
-        [HttpPost("authenticate", Name = "Authenticate")]
+        [HttpPost("auth", Name = "Authenticate")]
         [ProducesResponseType(typeof(Tokens), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         public ActionResult<Tokens> Authenticate(User user)

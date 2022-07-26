@@ -25,29 +25,37 @@ namespace SwiftUserManagement.API.Repositories
         // Code to see if a user matches, 
         public Tokens Authenticate(User user)
         {
-            var foundUserFromDb = _userRepository.GetUser(user.UserName);
-            _logger.LogError(foundUserFromDb.ToString());
+            var foundUserFromDb = _userRepository.GetUserByEmail(user.Email);
 
-            // If the user password and username don't match
-            if (!(foundUserFromDb.Result.UserName == user.UserName && foundUserFromDb.Result.Password == user.Password)) 
+           
+           if(foundUserFromDb == null)
             {
-                return null;
+                return new Tokens { Token = "Unauthorized" };
             }
 
-            // Generate token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            // If the user password and username don't match
+            if (foundUserFromDb.Result.Email == user.Email && foundUserFromDb.Result.Password == user.Password)
             {
-                Subject = new ClaimsIdentity(new Claim[]
-              {
+                // Generate token
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                  {
              new Claim(ClaimTypes.Name, user.UserName)
-              }),
-                Expires = DateTime.UtcNow.AddMinutes(10),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return new Tokens { Token = tokenHandler.WriteToken(token) };
+                  }),
+                    Expires = DateTime.UtcNow.AddMinutes(10),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                _logger.LogInformation("Token created for user");
+
+                return new Tokens { Token = tokenHandler.WriteToken(token) };
+            }
+
+            return new Tokens { Token = "Unauthorized" };
+
         }
     }
 }

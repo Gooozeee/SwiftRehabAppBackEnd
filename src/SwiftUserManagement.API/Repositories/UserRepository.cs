@@ -49,6 +49,22 @@ namespace SwiftUserManagement.API.Repositories
             return user;
         }
 
+        public async Task<User> GetUserByEmail(string email)
+        {
+            using var connection = new NpgsqlConnection
+                (_configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
+
+            var user = await connection.QueryFirstOrDefaultAsync<User>
+                ("SELECT * FROM Users WHERE Email = @Email", new { Email = email });
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return user;
+        }
+
         // Updating user details
         public async Task<bool> UpdateUser(User user)
         {
