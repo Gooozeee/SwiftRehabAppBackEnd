@@ -28,7 +28,7 @@ namespace SwiftUserManagement.API.Controllers
 
 
         // Creating a user in the database
-        [HttpPost(Name = "CreateUser")]
+        [HttpPost("createUser", Name = "CreateUser")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         public async Task<ActionResult> createUser([FromBody] User user)
@@ -89,7 +89,7 @@ namespace SwiftUserManagement.API.Controllers
         }
 
         // Emitting the game results for analysis by the python file
-        [HttpPost(Name = "AnalyseGameScore")]
+        [HttpPost("analyseGameScore", Name = "AnalyseGameScore")]
         public ActionResult<bool> AnalyseGameResults([FromBody] GameResults gameResults)
         {
             var result = _rabbitMQRepository.EmitGameAnalysis(gameResults);

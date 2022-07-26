@@ -43,6 +43,7 @@ builder.Services.AddSwaggerGen(option =>
 // Setting up the user repository
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IJWTManagementRepository, JWTManagementRepository>();
+builder.Services.AddScoped<IRabbitMQRepository, RabbitMQRepository>();
 
 // Configuring JWT authentication
 builder.Services.AddAuthentication(x =>
