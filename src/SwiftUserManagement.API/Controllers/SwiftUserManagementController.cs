@@ -17,13 +17,17 @@ namespace SwiftUserManagement.API.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IJWTManagementRepository _jwtMangementRepository;
         private readonly IRabbitMQRepository _rabbitMQRepository;
+        private readonly ILogger<SwiftUserManagementController> _logger;
 
-        public SwiftUserManagementController(IUserRepository userRepository, IJWTManagementRepository jwtMangementRepository, IRabbitMQRepository rabbitMQRepository)
+        public SwiftUserManagementController(IUserRepository userRepository, IJWTManagementRepository jwtMangementRepository, IRabbitMQRepository rabbitMQRepository, ILogger<SwiftUserManagementController> logger)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _jwtMangementRepository = jwtMangementRepository ?? throw new ArgumentNullException(nameof(jwtMangementRepository));
             _rabbitMQRepository = rabbitMQRepository ?? throw new ArgumentNullException(nameof(rabbitMQRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+
 
 
 
@@ -95,6 +99,14 @@ namespace SwiftUserManagement.API.Controllers
             var result = _rabbitMQRepository.EmitGameAnalysis(gameResults);
             if (!result) return BadRequest(new { Message = "User not found" });
             return Ok(result);
+        }
+
+        // Receiving video data from the React client
+        [HttpPost("analyseVideo", Name = "AnalyseVideo")]
+        public ActionResult<bool> AnalyseVideoResult([FromForm] List<IFormFile> videoData)
+        {
+            _logger.LogInformation("File received");
+            return Ok("File received");
         }
     }
 }
