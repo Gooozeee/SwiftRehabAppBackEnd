@@ -18,6 +18,12 @@ services:
     build:
       context: .
       dockerfile: SwiftUserManagement.API/Dockerfile
+ 
+  GameAnalysisRabbitMQClient:
+    image: ${DOCKER_REGISTRY-}python-gameanalysis
+    build:
+      context: .
+      dockerfile: GameAnalysis/Dockerfile
 
 volumes:
   mongo_data:

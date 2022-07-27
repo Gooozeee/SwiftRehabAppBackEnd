@@ -4,10 +4,30 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{11A299BE-51D4-48C0-8516-906F4AB46298}"
+	ProjectSection(SolutionItems) = preProject
+		PythonRequirements\Requirements.txt = PythonRequirements\Requirements.txt
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SwiftUserManagement.API", "SwiftUserManagement.API\SwiftUserManagement.API.csproj", "{54D2E0DA-D5A4-4A4C-8C48-8F34A4057AD8}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{9574DED3-452D-41C4-B6BD-7357E12D6B53}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GameAnalysis", "GameAnalysis", "{15796A61-9317-46DD-94D7-7DB42AA1650A}"
+	ProjectSection(SolutionItems) = preProject
+		GameAnalysis\Dockerfile = GameAnalysis\Dockerfile
+		GameAnalysis\GameAnalysisRabbitMQClient.py = GameAnalysis\GameAnalysisRabbitMQClient.py
+		GameAnalysis\Requirements.txt = GameAnalysis\Requirements.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VideoAnalysis", "VideoAnalysis", "{0A2B6DC6-38D4-4001-AEDB-A01FDD5D65F4}"
+	ProjectSection(SolutionItems) = preProject
+		VideoAnalysis\VideoAnalysisRabbitMQClient.py = VideoAnalysis\VideoAnalysisRabbitMQClient.py
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PythonRequirements", "PythonRequirements", "{13D94E84-F501-44DA-B0BD-75ED41CE9531}"
+	ProjectSection(SolutionItems) = preProject
+		PythonRequirements\Requirements.txt = PythonRequirements\Requirements.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +66,9 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{54D2E0DA-D5A4-4A4C-8C48-8F34A4057AD8} = {11A299BE-51D4-48C0-8516-906F4AB46298}
+		{15796A61-9317-46DD-94D7-7DB42AA1650A} = {11A299BE-51D4-48C0-8516-906F4AB46298}
+		{0A2B6DC6-38D4-4001-AEDB-A01FDD5D65F4} = {11A299BE-51D4-48C0-8516-906F4AB46298}
+		{13D94E84-F501-44DA-B0BD-75ED41CE9531} = {11A299BE-51D4-48C0-8516-906F4AB46298}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D8BC0A0-B964-43D6-B3A3-A78C758EAB27}
