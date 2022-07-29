@@ -1,5 +1,6 @@
 ﻿using RabbitMQ.Client;
 using SwiftUserManagement.API.Entities;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 
@@ -41,6 +42,43 @@ namespace SwiftUserManagement.API.Repositories
                                      basicProperties: null,
                                      body: body);
                 _Logger.LogInformation("Sent game results for analysis");
+
+                return true;
+            }
+        }
+
+        // Sending out the video file task to the queue
+        public async Task<bool> EmitVideoAnalysis(IFormFile video)
+        {
+            if(video == null)
+            {
+                return false;
+            }
+
+            // Connecting to the RabbitMQ queue
+            var factory = new ConnectionFactory() { HostName = "rabbitmq" };
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                _Logger.LogInformation("Sending video file for analysis");
+                // Setting up and sending the message
+                channel.ExchangeDeclare(exchange: "swift_rehab_app",
+                                        type: "topic");
+
+                var routingKey = "video.fromApp";
+
+
+
+                MemoryStream ms = new MemoryStream(new byte[video.Length]);
+                await video.CopyToAsync(ms);
+
+
+                //var body = Encoding.UTF8.GetBytes(video.OpenReadStream());
+                channel.BasicPublish(exchange: "swift_rehab_app",
+                                     routingKey: routingKey,
+                                     basicProperties: null,
+                                     body: ms.ToArray());
+                _Logger.LogInformation($"Sent video file for analysis + {ms.ToArray()}");
 
                 return true;
             }

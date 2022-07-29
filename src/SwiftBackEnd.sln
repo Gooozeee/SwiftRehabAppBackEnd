@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GameAnalysis", "GameAnalysi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VideoAnalysis", "VideoAnalysis", "{0A2B6DC6-38D4-4001-AEDB-A01FDD5D65F4}"
 	ProjectSection(SolutionItems) = preProject
+		VideoAnalysis\Dockerfile = VideoAnalysis\Dockerfile
+		VideoAnalysis\Requirements.txt = VideoAnalysis\Requirements.txt
 		VideoAnalysis\VideoAnalysisRabbitMQClient.py = VideoAnalysis\VideoAnalysisRabbitMQClient.py
 	EndProjectSection
 EndProject
@@ -28,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PythonRequirements", "Pytho
 	ProjectSection(SolutionItems) = preProject
 		PythonRequirements\Requirements.txt = PythonRequirements\Requirements.txt
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UploadedVideos", "UploadedVideos", "{B3E2CA14-0042-4D33-844B-535506FABD5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +73,7 @@ Global
 		{15796A61-9317-46DD-94D7-7DB42AA1650A} = {11A299BE-51D4-48C0-8516-906F4AB46298}
 		{0A2B6DC6-38D4-4001-AEDB-A01FDD5D65F4} = {11A299BE-51D4-48C0-8516-906F4AB46298}
 		{13D94E84-F501-44DA-B0BD-75ED41CE9531} = {11A299BE-51D4-48C0-8516-906F4AB46298}
+		{B3E2CA14-0042-4D33-844B-535506FABD5F} = {0A2B6DC6-38D4-4001-AEDB-A01FDD5D65F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D8BC0A0-B964-43D6-B3A3-A78C758EAB27}

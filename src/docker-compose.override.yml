@@ -53,5 +53,12 @@ services:
       - PYTHONUNBUFFERED=1
     restart: always
 
+  VideoAnalysisRabbitMQClient:
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
+    volumes:
+      - /src/VideoAnalysis/UploadedVideos
+
   
   

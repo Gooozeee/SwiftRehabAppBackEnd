@@ -25,6 +25,14 @@ services:
       context: .
       dockerfile: GameAnalysis/Dockerfile
 
+  VideoAnalysisRabbitMQClient:
+    image: ${DOCKER_REGISTRY-}python-videoanalysis
+    volumes: 
+      - /src/VideoAnalysis/UploadedVideos
+    build:
+      context: .
+      dockerfile: VideoAnalysis/Dockerfile
+
 volumes:
   mongo_data:
   portainer_data:

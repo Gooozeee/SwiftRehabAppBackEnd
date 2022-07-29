@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SwiftUserManagement.API.Entities;
 using SwiftUserManagement.API.Repositories;
+using System.IO;
 using System.Net;
 
 namespace SwiftUserManagement.API.Controllers
@@ -18,20 +19,21 @@ namespace SwiftUserManagement.API.Controllers
         private readonly IJWTManagementRepository _jwtMangementRepository;
         private readonly IRabbitMQRepository _rabbitMQRepository;
         private readonly ILogger<SwiftUserManagementController> _logger;
+        private readonly IHostEnvironment _environment;
 
-        public SwiftUserManagementController(IUserRepository userRepository, IJWTManagementRepository jwtMangementRepository, IRabbitMQRepository rabbitMQRepository, ILogger<SwiftUserManagementController> logger)
+        public SwiftUserManagementController(IUserRepository userRepository, IJWTManagementRepository jwtMangementRepository, IRabbitMQRepository rabbitMQRepository, ILogger<SwiftUserManagementController> logger, IHostEnvironment environment)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _jwtMangementRepository = jwtMangementRepository ?? throw new ArgumentNullException(nameof(jwtMangementRepository));
             _rabbitMQRepository = rabbitMQRepository ?? throw new ArgumentNullException(nameof(rabbitMQRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
 
 
 
-
-
         // Creating a user in the database
+        [AllowAnonymous]
         [HttpPost("createUser", Name = "CreateUser")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -69,6 +71,7 @@ namespace SwiftUserManagement.API.Controllers
         }
 
         // Letting the client know it is connected to the server
+        [AllowAnonymous]
         [HttpGet("pingServer", Name = "Ping")]
         public string pingServer()
         {
@@ -93,7 +96,10 @@ namespace SwiftUserManagement.API.Controllers
         }
 
         // Emitting the game results for analysis by the python file
+        //[Authorize]
         [HttpPost("analyseGameScore", Name = "AnalyseGameScore")]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public ActionResult<bool> AnalyseGameResults([FromBody] GameResults gameResults)
         {
             var result = _rabbitMQRepository.EmitGameAnalysis(gameResults);
@@ -102,10 +108,16 @@ namespace SwiftUserManagement.API.Controllers
         }
 
         // Receiving video data from the React client
+        //[Authorize]
         [HttpPost("analyseVideo", Name = "AnalyseVideo")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public ActionResult<bool> AnalyseVideoResult([FromForm] List<IFormFile> videoData)
         {
-            _logger.LogInformation("File received");
+            // Send the first file in the array for analysis
+            _rabbitMQRepository.EmitVideoAnalysis(videoData[0]);
+
+            _logger.LogInformation($"File received: {videoData}");
             return Ok("File received");
         }
     }

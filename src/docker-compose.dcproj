@@ -9,6 +9,7 @@
     <DockerServiceName>swiftusermanagement.api</DockerServiceName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='docker|AnyCPU'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='dockwer1|AnyCPU'" />
   <ItemGroup>
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
