@@ -94,19 +94,26 @@ namespace SwiftUserManagement.API.Controllers
         }
 
         // Emitting the game results for analysis by the python file
-        [Authorize]
+        //[Authorize]
         [HttpPost("analyseGameScore", Name = "AnalyseGameScore")]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public ActionResult<bool> AnalyseGameResults([FromBody] GameResults gameResults)
         {
+            if(gameResults == null)
+                return BadRequest(new { Message = "Invalid game data" });
+
             var result = _rabbitMQRepository.EmitGameAnalysis(gameResults);
-            if (!result) return BadRequest(new { Message = "User not found" });
-            return Ok(result);
+            if (!result) 
+                return BadRequest(new { Message = "User not found" });
+
+            var receivedData = _rabbitMQRepository.ReceiveGameAnalysis();
+
+            return Ok(receivedData);
         }
 
         // Receiving video data from the React client
-        [Authorize]
+        //[Authorize]
         [HttpPost("analyseVideo", Name = "AnalyseVideo")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
