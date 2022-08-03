@@ -47,29 +47,29 @@ namespace SwiftUserManagement.API.Extensions
                     command.CommandText = @"CREATE TABLE Users(Id SERIAL PRIMARY KEY,
                                                                 Email VARCHAR(24) NOT NULL,
                                                                 UserName VARCHAR(24) NOT NULL,
-                                                                Password VARCHAR(24) NOT NULL,
+                                                                Password VARCHAR NOT NULL,
                                                                 Role VARCHAR(24) NOT NULL
                                                                 )";
                     command.ExecuteNonQuery();
 
-                    command.CommandText = "INSERT INTO Users(Email, UserName, Password, Role) VALUES('michalguzym@gmail.com', 'Michal Guzy', 'password', 'User');";
+                    command.CommandText = "INSERT INTO Users(Email, UserName, Password, Role) VALUES('michalguzym@gmail.com', 'Michal Guzy', '$2a$12$BFN3V/Rt6tSsO3Lpz4ue8O.Bg.Jb5dA7l08/LPBn./PpSiRQPO16a', 'User');";
                     command.ExecuteNonQuery();
 
-                    command.CommandText = "INSERT INTO Users(Email, UserName, Password, Role) VALUES('sophie@gmail.com', 'Sophie Young', 'password', 'User');";
+                    command.CommandText = "INSERT INTO Users(Email, UserName, Password, Role) VALUES('sophie@gmail.com', 'Sophie Young', '$2a$12$BFN3V/Rt6tSsO3Lpz4ue8O.Bg.Jb5dA7l08/LPBn./PpSiRQPO16a', 'User');";
                     command.ExecuteNonQuery();
 
                     // Creating and populating the videos table
                     command.CommandText = @"CREATE TABLE Videos(Id SERIAL PRIMARY KEY,
                                                                 User_Id INT NOT NULL,
-                                                                FilePath VARCHAR(255) NOT NULL,
-                                                                Prediction VARCHAR(255) NOT NULL,
+                                                                Video_Name VARCHAR(255) NOT NULL,
+                                                                Weakness_Prediction TEXT,
                                                                 CONSTRAINT fk_user
                                                                     FOREIGN KEY(User_Id)
                                                                         REFERENCES Users(Id))";
                     command.ExecuteNonQuery();
 
-                    command.CommandText = "INSERT INTO Videos(User_Id, FilePath, Prediction) VALUES(1, 'filepath', 'prediction');";
-                    command.ExecuteNonQuery();
+                    //command.CommandText = "INSERT INTO Videos(User_Id, Video_Name, Weakness_Prediction) VALUES(1, 'Video.mp4', '{'Message':'Empty'}');";
+                    //command.ExecuteNonQuery();
 
                     // Creating and populating the game scores table
                     command.CommandText = @"CREATE TABLE GameScores(Id SERIAL PRIMARY KEY,

@@ -27,8 +27,6 @@ services:
 
   VideoAnalysisRabbitMQClient:
     image: ${DOCKER_REGISTRY-}python-videoanalysis
-    volumes: 
-      - /src/VideoAnalysis/UploadedVideos
     build:
       context: .
       dockerfile: VideoAnalysis/Dockerfile

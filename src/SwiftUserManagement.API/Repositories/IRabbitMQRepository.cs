@@ -7,5 +7,7 @@ namespace SwiftUserManagement.API.Repositories
 
         bool EmitGameAnalysis(GameResults gameResults);
         Task<bool> EmitVideoAnalysis(IFormFile video);
+
+        string ReceiveVideoAnalysis();
     }
 }

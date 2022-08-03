@@ -19,15 +19,13 @@ namespace SwiftUserManagement.API.Controllers
         private readonly IJWTManagementRepository _jwtMangementRepository;
         private readonly IRabbitMQRepository _rabbitMQRepository;
         private readonly ILogger<SwiftUserManagementController> _logger;
-        private readonly IHostEnvironment _environment;
-
+       
         public SwiftUserManagementController(IUserRepository userRepository, IJWTManagementRepository jwtMangementRepository, IRabbitMQRepository rabbitMQRepository, ILogger<SwiftUserManagementController> logger, IHostEnvironment environment)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _jwtMangementRepository = jwtMangementRepository ?? throw new ArgumentNullException(nameof(jwtMangementRepository));
             _rabbitMQRepository = rabbitMQRepository ?? throw new ArgumentNullException(nameof(rabbitMQRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
 
 
@@ -46,14 +44,14 @@ namespace SwiftUserManagement.API.Controllers
             }
 
             // Creating the user
-            var result = await _userRepository.CreateUser(user);
+            var result = await _userRepository.CreateUser(user.Email, user.UserName, user.Password, user.Role);
 
             // Checking if the user exists or not
             if (result == false)
             {
                 return BadRequest(new { Message = "User already exists" });
             }
-            return CreatedAtRoute("CreateUser", new { userName = user.Password }, user);
+            return CreatedAtRoute("CreateUser", new { userName = user.UserName });
         }
 
         // Retreiving a user from the database
@@ -61,11 +59,11 @@ namespace SwiftUserManagement.API.Controllers
         [Authorize]
         [ProducesResponseType(typeof(User), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<User>> getUser(string userName)
+        public ActionResult<User> getUser(string userName)
         {
-            var user = await _userRepository.GetUser(userName);
+            var user = _userRepository.GetUser(userName);
 
-            if (user == null) return BadRequest(new { Message = "User not found" });
+            if (user.Result.Id == -1) return BadRequest(new { Message = "User not found" });
 
             return Ok(user);
         }
@@ -83,9 +81,9 @@ namespace SwiftUserManagement.API.Controllers
         [HttpPost("auth", Name = "Authenticate")]
         [ProducesResponseType(typeof(Tokens), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        public ActionResult<Tokens> Authenticate(User user)
+        public ActionResult<Tokens> Authenticate(string email, string password)
         {
-            var token = _jwtMangementRepository.Authenticate(user);
+            var token = _jwtMangementRepository.Authenticate(email, password);
 
             if (token == null)
             {
@@ -96,7 +94,7 @@ namespace SwiftUserManagement.API.Controllers
         }
 
         // Emitting the game results for analysis by the python file
-        //[Authorize]
+        [Authorize]
         [HttpPost("analyseGameScore", Name = "AnalyseGameScore")]
         [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -108,17 +106,43 @@ namespace SwiftUserManagement.API.Controllers
         }
 
         // Receiving video data from the React client
-        //[Authorize]
+        [Authorize]
         [HttpPost("analyseVideo", Name = "AnalyseVideo")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public ActionResult<bool> AnalyseVideoResult([FromForm] List<IFormFile> videoData)
+        public ActionResult<bool> AnalyseVideoResult([FromForm] List<IFormFile> videoData, string userName)
         {
-            // Send the first file in the array for analysis
-            _rabbitMQRepository.EmitVideoAnalysis(videoData[0]);
+            var user = _userRepository.GetUser(userName);
 
-            _logger.LogInformation($"File received: {videoData}");
-            return Ok("File received");
+            if (user.Result.Id == -1 ) 
+                return BadRequest(new { Message = "User not found" });
+
+            if (videoData.Count < 1 || videoData.Count > 1)
+                return BadRequest(new { Message = "Please only send one video file" });
+
+            if (!videoData[0].ContentType.Contains("video"))
+            {
+                return BadRequest(new { Message = "Please upload a video" });
+            }
+
+            // Send the first file in the array for analysis
+            _logger.LogInformation("Sending video file to python script for analysis");
+            _rabbitMQRepository.EmitVideoAnalysis(videoData[0]);
+            var fileName = videoData[0].FileName;
+
+            _logger.LogInformation("Waiting for response from python script");
+
+            string response = _rabbitMQRepository.ReceiveVideoAnalysis();
+
+            _logger.LogInformation("Adding analysis results into database");
+            if (!(_userRepository.AddVideoAnalysisData(fileName, user.Result.Id, response).Result))
+                return BadRequest(new { Message = "Not able to add data into database" });
+
+            if (response == "The request has timed out")
+                return BadRequest(new { Message = "The request has timed out" });
+
+            return Ok($"File analysed: " +
+                $"{response}");
         }
     }
 }

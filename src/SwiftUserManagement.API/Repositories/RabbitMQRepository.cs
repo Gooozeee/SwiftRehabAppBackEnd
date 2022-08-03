@@ -1,4 +1,5 @@
 ﻿using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using SwiftUserManagement.API.Entities;
 using System.IO;
 using System.Text;
@@ -81,6 +82,62 @@ namespace SwiftUserManagement.API.Repositories
                 _Logger.LogInformation($"Sent video file for analysis + {ms.ToArray()}");
 
                 return true;
+            }
+
+            
+          
+        }
+
+        // Receiving the video analysis results from the python script
+        public string ReceiveVideoAnalysis()
+        {
+            string receivedMessage = "";
+
+            var factory = new ConnectionFactory() { HostName = "rabbitmq" };
+            using (var connection = factory.CreateConnection()) 
+            using (var channel = connection.CreateModel())
+            {
+                channel.ExchangeDeclare(exchange: "swift_rehab_app", type: "topic");
+                var queueName = channel.QueueDeclare().QueueName;
+
+                channel.QueueBind(queue: queueName,
+                                  exchange: "swift_rehab_app",
+                                  routingKey: "video.toC#");
+
+                var consumer = new EventingBasicConsumer(channel);
+                consumer.Received += (model, ea) =>
+                {
+                    var body = ea.Body.ToArray();
+                    receivedMessage = Encoding.UTF8.GetString(body);
+                    var routingKey = ea.RoutingKey;
+                    
+                    //_Logger.LogInformation("Video analysis received '{0}':'{1}", routingKey, receivedMessage);
+                };
+
+                channel.BasicConsume(queue: queueName,
+                                     autoAck: true,
+                                     consumer: consumer);
+
+                int logValue = 0;
+                while(receivedMessage == "")
+                {
+                    logValue++;
+                    if(logValue % 500 == 0)
+                    {
+                        _Logger.LogInformation("Haven't received result yet");
+                    }
+                    Thread.Sleep(10);
+                    channel.BasicConsume(queue: queueName,
+                                     autoAck: true,
+                                     consumer: consumer);
+                    if(logValue > 1000)
+                    {
+                        return "The request has timed out";
+                    }
+                }
+
+                return receivedMessage;
+
             }
         }
     }

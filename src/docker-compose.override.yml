@@ -58,7 +58,7 @@ services:
       - PYTHONUNBUFFERED=1
     restart: always
     volumes:
-      - /src/VideoAnalysis/UploadedVideos
+      - /VideoAnalysis
 
   
   

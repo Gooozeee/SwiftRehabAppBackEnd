@@ -21,7 +21,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GameAnalysis", "GameAnalysi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VideoAnalysis", "VideoAnalysis", "{0A2B6DC6-38D4-4001-AEDB-A01FDD5D65F4}"
 	ProjectSection(SolutionItems) = preProject
+		VideoAnalysis\constant.py = VideoAnalysis\constant.py
 		VideoAnalysis\Dockerfile = VideoAnalysis\Dockerfile
+		VideoAnalysis\impairedweaknessmodel.sav = VideoAnalysis\impairedweaknessmodel.sav
+		VideoAnalysis\pose_analysis.py = VideoAnalysis\pose_analysis.py
+		VideoAnalysis\reduce_saved_frames.py = VideoAnalysis\reduce_saved_frames.py
 		VideoAnalysis\Requirements.txt = VideoAnalysis\Requirements.txt
 		VideoAnalysis\VideoAnalysisRabbitMQClient.py = VideoAnalysis\VideoAnalysisRabbitMQClient.py
 	EndProjectSection

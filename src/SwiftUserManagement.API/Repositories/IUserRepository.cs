@@ -9,7 +9,8 @@ namespace SwiftUserManagement.API.Repositories
     {
         Task<User> GetUser(string userName);
         Task<User> GetUserByEmail(string email);
-        Task<bool> CreateUser(User user);
+        Task<bool> CreateUser(string email, string userName, string password, string role);
         Task<bool> UpdateUser(User user);
+        Task<bool> AddVideoAnalysisData(string videoName, int userId, string weaknessPrediction);
     }
 }

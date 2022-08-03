@@ -5,7 +5,7 @@
     {
         public int Video_Id { get; set; }
         public int User_Id { get; set; }
-        public string FilePath { get; set; }
-        public string Prediction { get; set; }
+        public string Video_Name { get; set; }
+        public string Weakness_Prediction { get; set; }
     }
 }

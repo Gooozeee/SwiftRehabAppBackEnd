@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using BCrypt.Net;
+using Microsoft.IdentityModel.Tokens;
 using SwiftUserManagement.API.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -23,18 +24,18 @@ namespace SwiftUserManagement.API.Repositories
 
 
         // Code to see if a user matches, 
-        public Tokens Authenticate(User user)
+        public Tokens Authenticate(string email, string password)
         {
-            var foundUserFromDb = _userRepository.GetUserByEmail(user.Email);
+            var foundUserFromDb = _userRepository.GetUserByEmail(email);
 
            
-           if(foundUserFromDb == null)
+           if(foundUserFromDb.Result.Id == -1)
             {
                 return new Tokens { Token = "Unauthorized" };
             }
 
             // If the user password and username don't match
-            if (foundUserFromDb.Result.Email == user.Email && foundUserFromDb.Result.Password == user.Password)
+            if (foundUserFromDb.Result.Email == email && BCrypt.Net.BCrypt.Verify(password, foundUserFromDb.Result.Password))
             {
                 // Generate token
                 var tokenHandler = new JwtSecurityTokenHandler();
@@ -43,7 +44,7 @@ namespace SwiftUserManagement.API.Repositories
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                   {
-             new Claim(ClaimTypes.Name, user.UserName)
+             new Claim(ClaimTypes.Name, email)
                   }),
                     Expires = DateTime.UtcNow.AddMinutes(10),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
