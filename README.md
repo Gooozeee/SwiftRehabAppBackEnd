@@ -23,11 +23,11 @@ Instructions for running the back end API (This will containerise all the code n
 
 
 For the python set up (Running the python scripts outside of docker containers)
-1. Install python 3.9
+1. Install python 3.9 (Use python 3.6.6 for video analysis)
 2. Install pip
 3. cd into the requirements folder
 4. Run command pip install -r requirements.txt (This will install all required python packages)
 5. Run the python scripts by cd'ing into the folder and doing 'python SCRIPT_NAME.py' (Make sure the rabbitmq container is running first)
 
 To get the saved image from the video python container onto the host machine
-docker cp container_id:/src/VideoAnalysis/UploadedVideos/Video.mov 'to where you would like the video to go to'
+docker cp container_id:/src/VideoAnalysis/UploadedVideos/Video.mov filepath to where you would like the video to go to
